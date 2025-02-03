@@ -92,12 +92,16 @@ where
         let err = if val == 0 {
             0
         } else {
-            let x = val as i64;
-            let mut poly = 0_i64;
-            for &c in self.coeff.iter().rev() {
-                poly = poly * x + c;
+            // err = coeff[0] + coeff[1] * val + coeff[2] * val^2 + ... + coeff[n] * val^n
+            let mut var = 1i64;
+            let mut err = (var * self.coeff[0] / COEFF_MUL) as i32;
+
+            for coeff in &self.coeff[1..] {
+                var *= val as i64;
+                err += (var * *coeff / COEFF_MUL) as i32;
             }
-            (poly / COEFF_MUL) as i32
+
+            err
         };
 
         (val as i32 - err) as u16
